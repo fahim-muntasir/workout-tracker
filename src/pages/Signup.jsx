@@ -1,7 +1,57 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Signup() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState({});
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const apiUrl = import.meta.env.VITE_API_URL_V1;
+  const navigate = useNavigate();
+
+  const handler = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const submitHandler = async () => {
+    setLoading(true);
+    setError({});
+    try {
+      await axios.post(apiUrl + "/users", {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
+      navigate("/signin");
+      setLoading(false);
+    } catch ({ response }) {
+      console.log(response);
+      console.log("err");
+      if (response.status === 400) {
+        if (response?.data?.data.length > 0) {
+          const generateErrorObj = {};
+
+          response.data?.data?.forEach((err) => {
+            generateErrorObj[err.field] = err.message;
+          });
+          setError(generateErrorObj);
+        } else {
+          setError({ globalError: response.data?.error });
+        }
+      }
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="container-fluid">
       <div
@@ -23,44 +73,57 @@ function Signup() {
             <div className="form-floating mb-3">
               <input
                 type="text"
+                name="name"
                 className="form-control"
-                id="floatingText"
-                placeholder="jhondoe"
+                placeholder="name"
+                onChange={handler}
+                value={formData.name}
+                required
               />
-              <label htmlFor="floatingText">Username</label>
+              <label htmlFor="name">Name</label>
+              {error?.name && <div className="text-danger">{error?.name}</div>}
             </div>
             <div className="form-floating mb-3">
               <input
                 type="email"
+                name="email"
                 className="form-control"
-                id="floatingInput"
-                placeholder="name@example.com"
+                placeholder="email@email.com"
+                onChange={handler}
+                value={formData.email}
+                required
               />
-              <label htmlFor="floatingInput">Email address</label>
+              <label htmlFor="email">Email address</label>
+              {error?.email && (
+                <div className="text-danger">{error?.email}</div>
+              )}
             </div>
             <div className="form-floating mb-4">
               <input
                 type="password"
                 className="form-control"
-                id="floatingPassword"
-                placeholder="Password"
+                name="password"
+                placeholder="password"
+                onChange={handler}
+                value={formData.password}
+                required
               />
-              <label htmlFor="floatingPassword">Password</label>
+              <label htmlFor="password">Password</label>
+              {error?.password && (
+                <div className="text-danger">{error?.password}</div>
+              )}
             </div>
-            <div className="d-flex align-items-center justify-content-between mb-4">
-              <div className="form-check">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id="exampleCheck1"
-                />
-                <label className="form-check-label" htmlFor="exampleCheck1">
-                  Check me out
-                </label>
+            {error?.globalError && (
+              <div className="alert alert-danger" role="alert">
+                {error.globalError}
               </div>
-              <a href="">Forgot Password</a>
-            </div>
-            <button type="submit" className="btn btn-primary py-3 w-100 mb-4">
+            )}
+            <button
+              disabled={loading}
+              onClick={submitHandler}
+              type="submit"
+              className="btn btn-primary py-3 w-100 mb-4"
+            >
               Sign Up
             </button>
             <p className="text-center mb-0">
