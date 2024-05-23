@@ -1,14 +1,12 @@
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { UseAuthContext } from "../context/AuthProvider";
 
 function Signin() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({});
-  const navigate = useNavigate();
 
   const { login } = UseAuthContext();
 
@@ -27,7 +25,7 @@ function Signin() {
         email: formData.email,
         password: formData.password,
       });
-      navigate("/");
+      location.replace("/");
       setLoading(false);
     } catch ({ response }) {
       if (response.status === 400) {

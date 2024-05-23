@@ -1,4 +1,4 @@
-import SalesRevenueChart from './SalesRevienueChart';
+import WorkoutChart from './workoutChart';
 
 export default function Chart() {
   return (
@@ -10,7 +10,7 @@ export default function Chart() {
               <h6 className="mb-0">Your recent workout</h6>
               <a href="">Show All</a>
             </div>
-            <SalesRevenueChart />
+            <WorkoutChart />
           </div>
         </div>
       </div>
