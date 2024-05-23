@@ -20,7 +20,7 @@ function App() {
       <Route path="/" element={<PrivateRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/workouts" element={<Workouts />} />
-        <Route path="/workouts/new" element={<AddWorkout />} />
+        <Route path="/workouts/:id" element={<AddWorkout />} />
         <Route path="/exercise" element={<Exercise />} />
         <Route path="/exercise/:id" element={<AddExercise />} />
       </Route>

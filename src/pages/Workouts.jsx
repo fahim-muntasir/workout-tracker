@@ -1,7 +1,40 @@
 import Layout from "../components/Layout";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axiosInstance from "../instance/axios";
+import { toast } from "react-toastify";
+import { UseAuthContext } from "../context/AuthProvider";
 
 export default function Workouts() {
+  const [workouts, setWorkouts] = useState([]);
+  const { user } = UseAuthContext();
+
+  const getWorkouts = async () => {
+    try {
+      const { data: response } = await axiosInstance.get(
+        "/users/workouts/" + user.id
+      );
+
+      setWorkouts(response?.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getWorkouts();
+  }, []);
+
+  const deleteHandler = async (id) => {
+    try {
+      await axiosInstance.delete("/workouts/" + id);
+      getWorkouts();
+      toast.success("Workout have been deleted successfully");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Layout>
       <div className="container-fluid pt-4 px-4">
@@ -21,42 +54,56 @@ export default function Workouts() {
                   <thead>
                     <tr>
                       <th scope="col">#</th>
-                      <th scope="col">First Name</th>
-                      <th scope="col">Last Name</th>
-                      <th scope="col">Email</th>
-                      <th scope="col">Country</th>
-                      <th scope="col">ZIP</th>
-                      <th scope="col">Status</th>
+                      <th scope="col">Workout_Date</th>
+                      <th scope="col">Exercise_Name</th>
+                      <th scope="col">Difficulty_Level</th>
+                      <th scope="col">Equipment</th>
+                      <th scope="col">Muscle_group</th>
+                      <th scope="col">Duration</th>
+                      <th scope="col">Sets</th>
+                      <th scope="col">Reps</th>
+                      <th scope="col">Weight</th>
+                      <th scope="col">Notes</th>
+                      <th scope="col">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <th scope="row">1</th>
-                      <td>John</td>
-                      <td>Doe</td>
-                      <td>jhon@email.com</td>
-                      <td>USA</td>
-                      <td>123</td>
-                      <td>Member</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">2</th>
-                      <td>Mark</td>
-                      <td>Otto</td>
-                      <td>mark@email.com</td>
-                      <td>UK</td>
-                      <td>456</td>
-                      <td>Member</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">3</th>
-                      <td>Jacob</td>
-                      <td>Thornton</td>
-                      <td>jacob@email.com</td>
-                      <td>AU</td>
-                      <td>789</td>
-                      <td>Member</td>
-                    </tr>
+                    {workouts.map((item, index) => (
+                      <tr key={item.id}>
+                        <th scope="row">{index + 1}</th>
+                        <td>
+                          {new Date(item.workout_date).toLocaleDateString()}
+                        </td>
+                        <td>{item.exercise.exercise_name}</td>
+                        <td>{item.exercise.difficulty_level}</td>
+                        <td>{item.exercise.equipment}</td>
+                        <td>{item.exercise.muscle_group}</td>
+                        <td>{item.duration}</td>
+                        <td>{item.sets}</td>
+                        <td>{item.reps}</td>
+                        <td>{item.weight}</td>
+                        <td>{item.notes}</td>
+                        <td>
+                          <div className="row">
+                            <div className="col-6">
+                              <Link to={`/workouts/${item.id}`}>
+                                <button className="btn btn-secondary btn-sm">
+                                  Edit
+                                </button>
+                              </Link>
+                            </div>
+                            <div className="col-6">
+                              <button
+                                onClick={() => deleteHandler(item.id)}
+                                className="btn btn-primary btn-sm"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
