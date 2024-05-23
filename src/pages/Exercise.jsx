@@ -1,7 +1,35 @@
+import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import axiosInstance from "../instance/axios";
 
 export default function Exercise() {
+  const [exercises, setExercises] = useState([]);
+
+  const getExercises = async () => {
+    try {
+      const { data: response } = await axiosInstance.get("/exercises");
+      setExercises(response?.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getExercises();
+  }, []);
+
+  const deleteHandler = async (id) => {
+    try {
+      await axiosInstance.delete("/exercises/" + id);
+      getExercises();
+      toast.success("Exercises have been deleted successfully")
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Layout>
       <div className="container-fluid pt-4 px-4">
@@ -21,42 +49,38 @@ export default function Exercise() {
                   <thead>
                     <tr>
                       <th scope="col">#</th>
-                      <th scope="col">First Name</th>
-                      <th scope="col">Last Name</th>
-                      <th scope="col">Email</th>
-                      <th scope="col">Country</th>
-                      <th scope="col">ZIP</th>
-                      <th scope="col">Status</th>
+                      <th scope="col">Exercise Name</th>
+                      <th scope="col">Muscle group</th>
+                      <th scope="col">Equipment</th>
+                      <th scope="col">Difficulty level</th>
+                      <th scope="col">Description</th>
+                      <th scope="col">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <th scope="row">1</th>
-                      <td>John</td>
-                      <td>Doe</td>
-                      <td>jhon@email.com</td>
-                      <td>USA</td>
-                      <td>123</td>
-                      <td>Member</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">2</th>
-                      <td>Mark</td>
-                      <td>Otto</td>
-                      <td>mark@email.com</td>
-                      <td>UK</td>
-                      <td>456</td>
-                      <td>Member</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">3</th>
-                      <td>Jacob</td>
-                      <td>Thornton</td>
-                      <td>jacob@email.com</td>
-                      <td>AU</td>
-                      <td>789</td>
-                      <td>Member</td>
-                    </tr>
+                    {exercises.map((item, index) => (
+                      <tr key={item.id}>
+                        <th scope="row">{index + 1}</th>
+                        <td>{item.exercise_name}</td>
+                        <td>{item.muscle_group}</td>
+                        <td>{item.equipment}</td>
+                        <td>{item.difficulty_level}</td>
+                        <td>{item.description}</td>
+                        <td>
+                          <Link to={`/exercise/${item.id}`}>
+                          <button className="btn btn-secondary btn-sm">
+                            Edit
+                          </button>
+                          </Link>
+                          <button
+                            onClick={() => deleteHandler(item.id)}
+                            className="btn btn-primary btn-sm"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>

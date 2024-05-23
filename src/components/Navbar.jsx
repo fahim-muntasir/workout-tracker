@@ -1,9 +1,11 @@
 import { useState } from "react";
 import logo from "../assets/logo.png";
 import { UseContext } from "../context/Provider";
+import { UseAuthContext } from "../context/AuthProvider";
 
 export default function Navbar() {
   const { sidebarToggle } = UseContext();
+  const {logout} = UseAuthContext();
   const [show, setShow] = useState(false);
 
   const userSettingMenuToggle = () => {
@@ -31,9 +33,8 @@ export default function Navbar() {
       </form>
       <div className="navbar-nav align-items-center ms-auto">
         <div className={`nav-item dropdown ${show && "show"}`}>
-          <a
-            href="#"
-            className="nav-link dropdown-toggle"
+          <button
+            className="btn nav-link dropdown-toggle"
             data-bs-toggle="dropdown"
             onClick={userSettingMenuToggle}
           >
@@ -44,7 +45,7 @@ export default function Navbar() {
               style={{ width: "40px", height: "40px" }}
             />
             <span className="d-none d-lg-inline-flex">John Doe</span>
-          </a>
+          </button>
           <div className={`dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0 ${show && "show"}`}>
             <a href="#" className="dropdown-item">
               My Profile
@@ -52,9 +53,9 @@ export default function Navbar() {
             <a href="#" className="dropdown-item">
               Settings
             </a>
-            <a href="#" className="dropdown-item">
+            <button className="dropdown-item" onClick={logout}>
               Log Out
-            </a>
+            </button>
           </div>
         </div>
       </div>
